@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>20世纪哲学流派图鉴</title>
+
+<!-- Open Graph 社交分享 -->
+<meta property="og:title" content="20世纪哲学流派图鉴">
+<meta property="og:description" content="从现象学到后现代主义，18位哲学家的思想地图与关系碰撞。胡塞尔、海德格尔、萨特、福柯……点击探索那些改变世界思想的人。">
+<meta property="og:type" content="website">
+<meta property="og:image" content="https://via.placeholder.com/1200x630/1D9E75/ffffff?text=20世纪哲学流派图鉴">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="description" content="从现象学到后现代主义，18位哲学家的思想地图与关系碰撞。">
+
+<!-- 微信分享优化 -->
+<meta name="format-detection" content="telephone=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { font-family: -apple-system, "PingFang SC", "Helvetica Neue", Arial, sans-serif; background: #f7f6f3; color: #111; min-height: 100vh; }
+
+/* ── Loading ── */
+#loading {
+  position: fixed; inset: 0; z-index: 100;
+  background: #0e1a14;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  transition: opacity 0.6s ease;
+}
+#loading.hide { opacity: 0; pointer-events: none; }
+.loading-ring {
+  width: 48px; height: 48px;
+  border: 2px solid rgba(29,158,117,0.3);
+  border-top-color: #1D9E75;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 28px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-quote {
+  font-size: 15px; color: #5DCAA5; letter-spacing: 0.12em;
+  margin-bottom: 10px; text-align: center; padding: 0 32px;
+}
+.loading-sub { font-size: 12px; color: #1D9E75; opacity: 0.6; letter-spacing: 0.08em; }
+.loading-dots span {
+  display: inline-block; width: 5px; height: 5px; border-radius: 50%;
+  background: #1D9E75; margin: 0 3px; opacity: 0.3;
+  animation: dot 1.2s ease-in-out infinite;
+}
+.loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+.loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes dot { 0%,80%,100%{opacity:0.3} 40%{opacity:1} }
+
+/* ── App ── */
+#app { display: none; min-height: 100vh; }
+#app.visible { display: block; }
+
+/* ── Sticky Header ── */
+#sticky-header {
+  position: sticky; top: 0; z-index: 10;
+  background: #ffffff;
+  border-bottom: 1px solid #e8e5de;
+  padding: 10px 16px 8px;
+}
+.header-title {
+  font-size: 15px; font-weight: 500; color: #111;
+  margin-bottom: 10px; display: flex; align-items: center; gap: 8px;
+}
+.header-title span { font-size: 11px; color: #999; font-weight: 400; }
+
+/* ── School Tabs ── */
+.tabs-wrap {
+  display: flex; gap: 6px; overflow-x: auto; padding-bottom: 2px;
+  -webkit-overflow-scrolling: touch; scrollbar-width: none;
+}
+.tabs-wrap::-webkit-scrollbar { display: none; }
+.school-pill {
+  padding: 6px 12px; border-radius: 20px; font-size: 12px;
+  cursor: pointer; border: 1px solid; white-space: nowrap;
+  transition: all 0.15s; flex-shrink: 0; min-height: 32px;
+  display: flex; align-items: center;
+}
+
+/* ── Timeline ── */
+.tl-wrap { margin-top: 10px; }
+.tl-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+.tl-label { font-size: 10px; color: #999; width: 56px; flex-shrink: 0; text-align: right; }
+.tl-track { flex: 1; position: relative; height: 6px; background: #eee; border-radius: 3px; }
+.tl-bar { position: absolute; height: 100%; border-radius: 3px; cursor: pointer; transition: opacity 0.2s; }
+.tl-years { display: flex; justify-content: space-between; font-size: 9px; color: #bbb; margin-top: 3px; padding-left: 64px; }
+
+/* ── Main Layout ── */
+#main-wrap { padding: 12px 16px 32px; }
+
+/* Desktop: side-by-side */
+@media (min-width: 700px) {
+  #main-wrap { display: grid; grid-template-columns: minmax(0,280px) minmax(0,1fr); gap: 16px; align-items: start; }
+  #detail-panel { position: sticky; align-self: flex-start; }
+}
+
+/* ── Phil List ── */
+.section-label { font-size: 11px; font-weight: 500; color: #aaa; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 10px; }
+.phil-card {
+  padding: 12px 14px; border-radius: 10px;
+  border: 1px solid #e8e5de; background: #fff;
+  margin-bottom: 8px; cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.phil-card:active { background: #f9f8f5; }
+.phil-card-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.phil-name { font-size: 15px; font-weight: 500; color: #111; }
+.phil-dates { font-size: 11px; color: #999; margin-left: 5px; }
+.phil-en { font-size: 11px; color: #aaa; margin-top: 2px; }
+.school-tag { font-size: 10px; padding: 3px 8px; border-radius: 20px; flex-shrink: 0; white-space: nowrap; }
+
+/* ── Detail Panel ── */
+#detail-panel {
+  border-radius: 12px; border: 1px solid #e8e5de;
+  background: #fff; overflow: hidden;
+  transition: opacity 0.2s, transform 0.25s;
+  transform: translateX(0); opacity: 1;
+}
+#detail-panel.sliding { transform: translateX(16px); opacity: 0; }
+.detail-empty {
+  padding: 48px 24px; text-align: center;
+  color: #bbb; font-size: 13px; line-height: 2.2;
+}
+.detail-header {
+  padding: 16px; border-bottom: 1px solid rgba(0,0,0,0.06);
+}
+.detail-name { font-size: 20px; font-weight: 500; }
+.detail-en { font-size: 13px; opacity: 0.7; margin-top: 2px; }
+.detail-meta { display: flex; align-items: center; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
+.detail-dates { font-size: 12px; opacity: 0.7; }
+.detail-body { padding: 16px; }
+
+/* Mobile: detail below list */
+@media (max-width: 699px) {
+  #detail-panel { margin-top: 8px; }
+}
+
+.sub-section { margin-bottom: 20px; }
+.rel-card {
+  padding: 10px 12px; border-radius: 8px;
+  border: 1px solid #e8e5de; margin-bottom: 8px;
+  cursor: pointer; background: #fff;
+  transition: background 0.15s;
+}
+.rel-card:active { background: #f5f5f5; }
+.rel-top { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 4px; }
+.rel-name { font-size: 13px; font-weight: 500; color: #111; }
+.rel-type { font-size: 10px; padding: 2px 7px; border-radius: 20px; background: #f2f1ee; color: #666; }
+.rel-desc { font-size: 12px; color: #666; line-height: 1.6; }
+.work-card {
+  padding: 10px 12px; border-radius: 8px;
+  border: 1px solid #e8e5de; margin-bottom: 8px; background: #fff;
+}
+.work-title-row { display: flex; align-items: baseline; gap: 8px; margin-bottom: 4px; }
+.work-title { font-size: 13px; font-weight: 500; color: #111; }
+.work-year { font-size: 11px; color: #aaa; }
+.work-idea { font-size: 12px; color: #666; line-height: 1.6; }
+.idea-item { display: flex; gap: 8px; align-items: flex-start; margin-bottom: 8px; }
+.idea-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; margin-top: 7px; }
+.idea-text { font-size: 13px; color: #222; line-height: 1.7; }
+
+/* Two-col detail on wide screens */
+@media (min-width: 500px) {
+  .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Loading Screen -->
+<div id="loading">
+  <div class="loading-ring"></div>
+  <div class="loading-quote" id="lq"></div>
+  <div class="loading-sub">正在展开思想地图</div>
+  <div class="loading-dots" style="margin-top:20px;">
+    <span></span><span></span><span></span>
+  </div>
+</div>
+
+<!-- App -->
+<div id="app">
+  <div id="sticky-header">
+    <div class="header-title">
+      20世纪哲学流派图鉴
+      <span>点击流派或哲学家探索</span>
+    </div>
+    <div class="tabs-wrap" id="school-tabs"></div>
+    <div class="tl-wrap">
+      <div id="tl-bars"></div>
+      <div class="tl-years">
+        <span>1900</span><span>1920</span><span>1940</span><span>1960</span><span>1980</span><span>2000</span><span>2020</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="main-wrap">
+    <div id="phil-col">
+      <div class="section-label">哲学家</div>
+      <div id="phil-list"></div>
+    </div>
+    <div id="detail-panel">
+      <div class="detail-empty">← 点击左侧任意哲学家<br>查看作品 · 思想 · 关系碰撞</div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+// ── Loading quotes ──
+const quotes = [
+  '"存在先于本质"',
+  '"语言是存在的家园"',
+  '"他者即地狱"',
+  '"回到事物本身"',
+  '"知识即权力"',
+  '"荒诞中的反抗"',
+  '"意义即使用"',
+  '"元叙事已经终结"',
+];
+document.getElementById('lq').textContent = quotes[Math.floor(Math.random()*quotes.length)];
+
+// ── Data ──
+const YS=1900, YR=120;
+const schools=[
+  {id:'phen',name:'现象学',en:'Phenomenology',period:[1900,1965],color:'#1D9E75',bg:'#E1F5EE',text:'#085041'},
+  {id:'exist',name:'存在主义',en:'Existentialism',period:[1920,1980],color:'#D85A30',bg:'#FAECE7',text:'#4A1B0C'},
+  {id:'anal',name:'分析哲学',en:'Analytic Philosophy',period:[1900,2020],color:'#185FA5',bg:'#E6F1FB',text:'#042C53'},
+  {id:'crit',name:'批判理论',en:'Critical Theory',period:[1930,2020],color:'#534AB7',bg:'#EEEDFE',text:'#26215C'},
+  {id:'post',name:'后结构主义',en:'Post-structuralism',period:[1960,2010],color:'#BA7517',bg:'#FAEEDA',text:'#412402'},
+  {id:'prag',name:'实用主义',en:'Pragmatism',period:[1900,2010],color:'#3B6D11',bg:'#EAF3DE',text:'#173404'},
+  {id:'pomo',name:'后现代主义',en:'Postmodernism',period:[1970,2010],color:'#993556',bg:'#FBEAF0',text:'#4B1528'},
+];
+const SM={};schools.forEach(s=>SM[s.id]=s);
+
+const P={
+  husserl:{name:'胡塞尔',en:'Edmund Husserl',dates:'1859–1938',school:'phen',
+    works:[{title:'《逻辑研究》',year:1900,idea:'批判心理主义，奠定纯粹逻辑学基础，开启分析与现象学的分叉'},{title:'《纯粹现象学观念》',year:1913,idea:'提出意向性与现象学还原，主张"回到事物本身"'},{title:'《欧洲科学的危机》',year:1936,idea:'引入"生活世界"概念，批判科学理性对日常经验根基的遗忘'}],
+    ideas:['意向性：意识永远是关于某物的意识，无法脱离对象','悬置（epoché）：括号括起日常信念，直达纯粹现象','生活世界是所有科学知识的被遗忘的意义根基'],
+    rels:[{id:'heidegger',type:'师徒·背叛',desc:'海德格尔是其最得意学生，却将现象学转向存在论，批判其以意识为核心的进路'},{id:'sartre',type:'隔代影响',desc:'萨特借用意向性与悬置，发展出存在主义现象学'},{id:'merleau',type:'继承·身体转向',desc:'梅洛-庞蒂继承其晚期生活世界思想，将重心从意识转向具身体验'}]},
+  heidegger:{name:'海德格尔',en:'Martin Heidegger',dates:'1889–1976',school:'phen',
+    works:[{title:'《存在与时间》',year:1927,idea:'"此在"在时间性中理解存在，人先于本质被抛入世界'},{title:'《技术的追问》',year:1954,idea:'现代技术将世界"座架"化，万物化为可调配储备，遮蔽存在真理'}],
+    ideas:['"此在"：人不是有理性的动物，而是操心存在意义的存在者','被抛性：我们发现自己已经在世界中，无法选择起点','死亡是最本真的可能性，直面死亡才能真正存在','技术现代性遮蔽了存在，语言是存在的家园'],
+    rels:[{id:'husserl',type:'师徒·反叛',desc:'受胡塞尔培养，却以存在论颠覆其意识哲学，胡塞尔临终痛心'},{id:'sartre',type:'影响·拒绝',desc:'萨特"存在先于本质"来自海德格尔，但海德格尔拒绝被贴上"存在主义"标签'},{id:'derrida',type:'解构源头',desc:'德里达的解构直接针对其"在场形而上学"，以延异取代存在差异'}]},
+  merleau:{name:'梅洛-庞蒂',en:'Maurice Merleau-Ponty',dates:'1908–1961',school:'phen',
+    works:[{title:'《知觉现象学》',year:1945,idea:'以身体为知觉主体，颠覆笛卡尔身心二元论'},{title:'《可见者与不可见者》',year:1968,idea:'提出"肉"本体论：主体与世界共属同一感知织体'}],
+    ideas:['身体是存在的媒介，而非灵魂的容器','知觉是前反思的，先于主客体分裂而发生','"肉"：我触摸世界，同时被世界触摸，主客界限消融'],
+    rels:[{id:'husserl',type:'继承·发展',desc:'继承现象学还原，将重心从先验意识转向具身生活体验'},{id:'sartre',type:'挚友·论战',desc:'批判萨特意识哲学忽视身体，两人对自由的理解大相径庭'}]},
+  sartre:{name:'萨特',en:'Jean-Paul Sartre',dates:'1905–1980',school:'exist',
+    works:[{title:'《存在与虚无》',year:1943,idea:'"自在存在"无意识，"自为存在"充满虚无与绝对自由'},{title:'《存在主义是一种人道主义》',year:1946,idea:'"存在先于本质"：人先存在，后由自己的选择定义自己'},{title:'《辩证理性批判》',year:1960,idea:'将存在主义与马克思主义结合，探讨历史中的集体自由'}],
+    ideas:['"存在先于本质"：没有上帝预设，人完全由选择构成','人被迫自由：无法不选择，拒绝选择本身也是一种选择','"他者即地狱"：他人的凝视将我对象化，威胁我的自由','坏信仰：假装自己没有选择的自欺行为'],
+    rels:[{id:'heidegger',type:'借鉴·分歧',desc:'借用此在分析与被抛性，但将自由推到极端'},{id:'beauvoir',type:'伴侣·共创',desc:'与波伏娃是终身伴侣与思想共同体，波伏娃将其自由论应用于女性处境'},{id:'camus',type:'友谊·决裂',desc:'因《反抗者》论战决裂：萨特支持革命暴力，加缪坚守有限度的道德反抗'},{id:'merleau',type:'论战',desc:'梅洛-庞蒂批判其凌驾意识于身体之上'}]},
+  camus:{name:'加缪',en:'Albert Camus',dates:'1913–1960',school:'exist',
+    works:[{title:'《西西弗神话》',year:1942,idea:'荒诞是人对意义的渴望与世界的沉默之间的张力；反抗是唯一诚实的选择'},{title:'《鼠疫》',year:1947,idea:'以瘟疫隐喻法西斯主义，颂扬荒诞中的团结与抵抗'},{title:'《反抗者》',year:1951,idea:'批判革命走向谋杀，反抗必须有限度，道德不可为历史献祭'}],
+    ideas:['荒诞：世界本无意义，人偏偏需要意义，这一裂缝就是荒诞','不自杀也不信仰：两种逃避都是对荒诞的背叛','反抗：在荒诞中创造局部意义，是尊严的唯一形式'],
+    rels:[{id:'sartre',type:'决裂',desc:'1952年《反抗者》引发公开论战，成为20世纪最著名的哲学决裂'}]},
+  beauvoir:{name:'波伏娃',en:'Simone de Beauvoir',dates:'1908–1986',school:'exist',
+    works:[{title:'《第二性》',year:1949,idea:'"女人不是天生的，而是后天形成的"——女性处境是历史与社会产物'},{title:'《模糊性的伦理》',year:1947,idea:'在存在主义框架内探讨自由与责任，批判个人自由忽视他者的伦理'}],
+    ideas:['"女人不是天生的，而是后天形成的"：性别是社会建构','女性被定义为男性的"他者"，自身主体性因此受压制','自由不能独享：压迫他人的自由本质上是自我欺骗'],
+    rels:[{id:'sartre',type:'伴侣·发展',desc:'将萨特存在主义自由理论应用于性别政治，开创女性主义存在主义'},{id:'butler',type:'开创先河',desc:'《第二性》直接启发了巴特勒的性别操演理论'}]},
+  russell:{name:'罗素',en:'Bertrand Russell',dates:'1872–1970',school:'anal',
+    works:[{title:'《数学原理》',year:1910,idea:'与怀特海合著，试图将全部数学还原为逻辑，奠定分析哲学基础'},{title:'《哲学问题》',year:1912,idea:'引入逻辑分析方法，主张哲学问题可通过语言分析澄清或消解'}],
+    ideas:['逻辑原子主义：世界由不可再分的简单事实构成','摹状词理论：通过逻辑分析消解伪指称问题','哲学的任务是澄清语言，而非建构形而上学体系'],
+    rels:[{id:'wittgenstein',type:'师徒·超越',desc:'维特根斯坦曾是罗素学生，后来从内部颠覆了逻辑原子主义'}]},
+  wittgenstein:{name:'维特根斯坦',en:'Ludwig Wittgenstein',dates:'1889–1951',school:'anal',
+    works:[{title:'《逻辑哲学论》',year:1921,idea:'语言图像世界；可说的要清楚地说，不可说的要沉默'},{title:'《哲学研究》',year:1953,idea:'"意义即使用"；语言游戏；家族相似性；反对寻求语言本质'}],
+    ideas:['早期：语言是现实的逻辑图像，哲学混乱源于语言越界','晚期：意义不是固定的，而是在语言游戏的使用中产生','家族相似性：概念无需共同本质，只需重叠相似性网络'],
+    rels:[{id:'russell',type:'师徒·颠覆',desc:'最终颠覆了整个分析哲学对逻辑形式的迷信'},{id:'heidegger',type:'平行·对照',desc:'两人都反对传统形而上学，路径截然相反：维特根斯坦用逻辑，海德格尔用诗意'}]},
+  quine:{name:'奎因',en:'Willard Van Orman Quine',dates:'1908–2000',school:'anal',
+    works:[{title:'《经验主义的两个教条》',year:1951,idea:'否定分析/综合区分；整体主义：信念整体面对经验法庭'},{title:'《词与对象》',year:1960,idea:'翻译不确定性：对同一言语行为可构造出相互不可化约的翻译方案'}],
+    ideas:['本体论相对性：存在何物依赖理论框架，没有绝对本体论','整体主义：整个知识网络面对经验，任何部分理论上都可修正'],
+    rels:[{id:'wittgenstein',type:'并行',desc:'共同瓦解"分析/综合"区分，推动分析哲学走向实用主义'},{id:'rorty',type:'影响',desc:'奎因的自然主义直接影响了罗蒂放弃镜像认识论'}]},
+  adorno:{name:'阿多诺',en:'Theodor W. Adorno',dates:'1903–1969',school:'crit',
+    works:[{title:'《启蒙辩证法》',year:1944,idea:'与霍克海默合著：启蒙理性走向反面，成为压迫工具'},{title:'《否定辩证法》',year:1966,idea:'以非同一性对抗黑格尔同一性哲学，拒绝将差异强行综合'},{title:'《美学理论》',year:1970,idea:'艺术通过形式自律抵抗商品化，是对社会总体性的唯一真实否定'}],
+    ideas:['工具理性：启蒙理性从解放工具变为统治工具','文化工业：大众文化标准化，系统钝化批判意识','否定辩证法：保留思想的非同一性，抵抗概念对差异的吞噬'],
+    rels:[{id:'habermas',type:'师徒·分歧',desc:'哈贝马斯批判阿多诺过于悲观，转向交往理性寻找解放出路'}]},
+  habermas:{name:'哈贝马斯',en:'Jürgen Habermas',dates:'1929–',school:'crit',
+    works:[{title:'《公共领域的结构转型》',year:1962,idea:'资产阶级公共领域的兴起与商品化侵蚀'},{title:'《交往行为理论》',year:1981,idea:'区分工具理性与交往理性，后者以理解为目的'},{title:'《现代性的哲学话语》',year:1985,idea:'为启蒙现代性辩护，批判后现代主义放弃了解放潜能'}],
+    ideas:['交往理性：语言对话中内在包含有效性声称（真、正、诚）','现代性是未完成的计划，而不是必须抛弃的规划','生活世界vs系统：货币与权力侵蚀生活世界是现代异化的根源'],
+    rels:[{id:'adorno',type:'继承·转向',desc:'以交往理性替代悲观的否定辩证法'},{id:'lyotard',type:'论战',desc:'核心对决：利奥塔宣告元叙事终结，哈贝马斯坚持普遍理性'},{id:'derrida',type:'论战·和解',desc:'长期论战现代性与理性，晚年九一一后有著名对话'}]},
+  derrida:{name:'德里达',en:'Jacques Derrida',dates:'1930–2004',school:'post',
+    works:[{title:'《论文字学》',year:1967,idea:'解构逻各斯中心主义：西方哲学特权化"言说"，以在场压制延异'},{title:'《书写与差异》',year:1967,idea:'播撒与延异：意义在差异网络中永远被推延，没有最终的所指'}],
+    ideas:['延异（différance）：意义在符号差异和时间推延中产生，永无终结','解构：不是摧毁，而是揭示文本内等级对立如何自我动摇','在场形而上学：西方哲学错误地将当下、言说视为终极根基'],
+    rels:[{id:'heidegger',type:'继承·激进化',desc:'激进化海德格尔对在场形而上学的批判，以延异取代存在差异'},{id:'foucault',type:'同代·分歧',desc:'德里达解读文本，福柯分析权力，两人曾有著名论战'},{id:'habermas',type:'论战·和解',desc:'哈贝马斯批判其理性主义立场，晚年携手对谈'}]},
+  foucault:{name:'福柯',en:'Michel Foucault',dates:'1926–1984',school:'post',
+    works:[{title:'《疯癫与文明》',year:1961,idea:'理性通过将疯癫他者化来确立自身；精神病院是排斥与规训的装置'},{title:'《规训与惩罚》',year:1975,idea:'全景监狱：现代权力通过可见性与规范化生产自我约束的"正常"主体'},{title:'《性史》第一卷',year:1976,idea:'性不是被压抑的，而是被权力话语生产出来的'}],
+    ideas:['知识-权力：任何知识都与权力关系交织','话语实践：话语生产真理，而非反映真理','生命政治：现代权力管理人口、身体与生死'],
+    rels:[{id:'derrida',type:'论战',desc:'德里达批判《疯癫与文明》对理性/疯癫二元的处理仍是形而上学的'},{id:'deleuze',type:'挚友·共鸣',desc:'德勒兹称福柯是"本世纪最伟大的哲学家"'},{id:'butler',type:'方法来源',desc:'权力-话语构建主体的理论是巴特勒性别操演论的核心来源'}]},
+  deleuze:{name:'德勒兹',en:'Gilles Deleuze',dates:'1925–1995',school:'post',
+    works:[{title:'《差异与重复》',year:1968,idea:'以差异本身为哲学起点，反对同一性哲学将差异从属于同一'},{title:'《反俄狄浦斯》',year:1972,idea:'与瓜塔里合著：欲望是生产性的，精神分析对欲望的解读是压抑性的'},{title:'《千高原》',year:1980,idea:'块茎对抗根茎：非等级、去中心的生成模型'}],
+    ideas:['块茎（rhizome）：知识与存在不是树状等级，而是四处蔓延的网络','欲望是生产性流动，而非缺乏与匮乏','逃逸线：总有逃离权力编码、创造新可能性的运动'],
+    rels:[{id:'foucault',type:'挚友·共鸣',desc:'与福柯亲密挚友，共同反对固化的主体概念'},{id:'derrida',type:'平行',desc:'同属后结构主义，德勒兹以生成与差异为核心，风格迥异'}]},
+  butler:{name:'巴特勒',en:'Judith Butler',dates:'1956–',school:'post',
+    works:[{title:'《性别麻烦》',year:1990,idea:'性别是操演性的——在重复引用规范的身体行为中被生产出来'},{title:'《脆弱的生命》',year:2004,idea:'"可悲悼性"的差异揭示了暴力与不平等的政治逻辑'}],
+    ideas:['性别操演性：性别不是你有的东西，而是你不断做的事','身体被话语和规范铭刻，没有性别前的"自然"身体','脆弱性是共同的人类条件，是政治连带的可能基础'],
+    rels:[{id:'beauvoir',type:'继承·激进化',desc:'将"女人是后天形成的"推进为：性别本身是操演/话语构成的'},{id:'foucault',type:'方法来源',desc:'福柯的权力-话语理论是其性别操演论的核心支柱'},{id:'derrida',type:'借用',desc:'借用德里达的引用性与迭代概念，理解性别规范如何在重复中被颠覆'}]},
+  dewey:{name:'杜威',en:'John Dewey',dates:'1859–1952',school:'prag',
+    works:[{title:'《民主与教育》',year:1916,idea:'教育是民主生活本身；学习是主动解决真实问题的过程'},{title:'《经验与自然》',year:1925,idea:'经验是有机体与环境的互动，先于主客体分裂'},{title:'《确定性的寻求》',year:1929,idea:'知识是行动性工具，而非现实的镜像'}],
+    ideas:['实验主义：哲学应效仿科学的假设-检验-修正循环','经验优先：经验是首要的，主客二分是后来的抽象','民主是生活方式：不只是政治制度，而是参与式的共同生活'],
+    rels:[{id:'rorty',type:'精神先驱',desc:'罗蒂视杜威为新实用主义的最重要先驱'},{id:'wittgenstein',type:'平行',desc:'工具主义与后期维特根斯坦的语言游戏精神高度一致'}]},
+  rorty:{name:'罗蒂',en:'Richard Rorty',dates:'1931–2007',school:'prag',
+    works:[{title:'《哲学和自然之镜》',year:1979,idea:'批判认识论传统：哲学不是认识自然的镜子，而是对话的延续'},{title:'《偶然、反讽与团结》',year:1989,idea:'反讽主义者对自己的最终词汇保持怀疑，但仍致力于减少苦难'}],
+    ideas:['反表征主义：语言不镜像现实，只是应对世界的工具','后哲学文化：用文学与历史叙事取代系统哲学','反讽主义：知道自身信念的偶然性，但仍坚守道德团结'],
+    rels:[{id:'dewey',type:'继承',desc:'将杜威与分析哲学和欧陆哲学融合，被视为新实用主义集大成者'},{id:'wittgenstein',type:'融合',desc:'将后期维特根斯坦的语用主义纳入实用主义传统'},{id:'habermas',type:'论战',desc:'罗蒂主张放弃普遍理性，哈贝马斯坚持交往理性不可放弃'}]},
+  lyotard:{name:'利奥塔',en:'Jean-François Lyotard',dates:'1924–1998',school:'pomo',
+    works:[{title:'《后现代状况》',year:1979,idea:'元叙事终结：宏大叙事失去合法性'},{title:'《争论》',year:1983,idea:'异质语言游戏之间存在无法化约的"争论"'}],
+    ideas:['后现代即对元叙事的不信任','知识合法性来自局部语言游戏的效能，而非宏大叙事','崇高：对不可再现之物的见证，是后现代艺术的核心任务'],
+    rels:[{id:'habermas',type:'论战',desc:'20世纪最重要的哲学论战之一：宣告元叙事终结vs坚持解放潜能'},{id:'wittgenstein',type:'借用',desc:'借用维特根斯坦的语言游戏概念，发展出多元异质的后现代语用学'}]},
+  baudrillard:{name:'鲍德里亚',en:'Jean Baudrillard',dates:'1929–2007',school:'pomo',
+    works:[{title:'《消费社会》',year:1970,idea:'消费是符号差异的生产与交换——你买的是身份，不是物品'},{title:'《仿像与仿真》',year:1981,idea:'"真实"已被超真实取代：地图先于领土，迪士尼比现实更真实'}],
+    ideas:['仿像（simulacra）：符号不再指向现实，生产"超真实"','超真实：模型取代了现实，我们生活在仿像中','消费是符号差异的游戏，而非使用价值的满足'],
+    rels:[{id:'lyotard',type:'同代',desc:'鲍德里亚聚焦媒介符号，利奥塔聚焦知识合法性'},{id:'foucault',type:'批判',desc:'批判福柯权力分析未能进入仿像层次'}]},
+};
+
+let selSchool=null, selPhil=null;
+
+// ── Tabs ──
+function renderTabs(){
+  const c=document.getElementById('school-tabs'); c.innerHTML='';
+  const all=document.createElement('button'); all.className='school-pill';
+  all.textContent='全部';
+  all.style.cssText=`background:${selSchool===null?'#e8e5de':'#fff'};border-color:#bbb;color:#333;`;
+  all.onclick=()=>{selSchool=null;selPhil=null;renderAll();};
+  c.appendChild(all);
+  schools.forEach(s=>{
+    const b=document.createElement('button'); b.className='school-pill';
+    const act=selSchool===s.id;
+    b.style.cssText=`background:${act?s.color:s.bg};border-color:${s.color};color:${act?'#fff':s.text};font-weight:${act?500:400};`;
+    b.textContent=s.name;
+    b.onclick=()=>{selSchool=s.id;selPhil=null;renderAll();};
+    c.appendChild(b);
+  });
+}
+
+// ── Timeline ──
+function renderTimeline(){
+  const c=document.getElementById('tl-bars'); c.innerHTML='';
+  schools.forEach(s=>{
+    const row=document.createElement('div'); row.className='tl-row';
+    const lbl=document.createElement('div'); lbl.className='tl-label'; lbl.textContent=s.name;
+    const track=document.createElement('div'); track.className='tl-track';
+    const bar=document.createElement('div'); bar.className='tl-bar';
+    const L=(s.period[0]-YS)/YR*100, W=(s.period[1]-s.period[0])/YR*100;
+    bar.style.cssText=`left:${L}%;width:${W}%;background:${s.color};opacity:${selSchool&&selSchool!==s.id?0.2:1};`;
+    bar.onclick=()=>{selSchool=s.id;selPhil=null;renderAll();};
+    track.appendChild(bar); row.appendChild(lbl); row.appendChild(track); c.appendChild(row);
+  });
+}
+
+// ── Phil List ──
+function renderList(){
+  const c=document.getElementById('phil-list'); c.innerHTML='';
+  Object.entries(P).filter(([id,p])=>!selSchool||p.school===selSchool).forEach(([id,p])=>{
+    const s=SM[p.school], act=selPhil===id;
+    const card=document.createElement('div'); card.className='phil-card';
+    card.style.borderColor=act?s.color:'#e8e5de';
+    card.style.background=act?s.bg:'#fff';
+    card.innerHTML=`<div class="phil-card-row"><div><span class="phil-name">${p.name}</span><span class="phil-dates">${p.dates}</span></div><span class="school-tag" style="background:${s.bg};color:${s.text};">${s.name}</span></div><div class="phil-en">${p.en}</div>`;
+    card.onclick=()=>{
+      selPhil=id; renderList(); animateDetail();
+      // 移动端：点击后滚动到详情
+      if(window.innerWidth<700){
+        setTimeout(()=>document.getElementById('detail-panel').scrollIntoView({behavior:'smooth',block:'start'}),50);
+      }
+    };
+    c.appendChild(card);
+  });
+}
+
+// ── Detail ──
+function animateDetail(){
+  const panel=document.getElementById('detail-panel');
+  panel.classList.add('sliding');
+  setTimeout(()=>{ buildDetail(); panel.classList.remove('sliding'); }, 200);
+}
+
+function buildDetail(){
+  const panel=document.getElementById('detail-panel');
+  if(!selPhil){
+    panel.innerHTML=`<div class="detail-empty">← 点击左侧任意哲学家<br>查看作品 · 思想 · 关系碰撞</div>`;
+    return;
+  }
+  const p=P[selPhil], s=SM[p.school];
+  const works=p.works.map(w=>`<div class="work-card"><div class="work-title-row"><span class="work-title">${w.title}</span><span class="work-year">${w.year}</span></div><div class="work-idea">${w.idea}</div></div>`).join('');
+  const ideas=p.ideas.map(i=>`<div class="idea-item"><div class="idea-dot" style="background:${s.color};"></div><div class="idea-text">${i}</div></div>`).join('');
+  const rels=p.rels.map(r=>{
+    const rp=P[r.id]; if(!rp)return'';
+    const rs=SM[rp.school];
+    return`<div class="rel-card" onclick="window.__sp('${r.id}')"><div class="rel-top"><span class="rel-name">${rp.name}</span><span class="school-tag" style="background:${rs.bg};color:${rs.text};">${rs.name}</span><span class="rel-type">${r.type}</span></div><div class="rel-desc">${r.desc}</div></div>`;
+  }).join('');
+
+  panel.innerHTML=`
+    <div class="detail-header" style="background:${s.bg};border-bottom:3px solid ${s.color};">
+      <div class="detail-name" style="color:${s.text};">${p.name}</div>
+      <div class="detail-en" style="color:${s.text};">${p.en}</div>
+      <div class="detail-meta">
+        <span class="detail-dates" style="color:${s.text};">${p.dates}</span>
+        <span class="school-tag" style="background:${s.color};color:#fff;">${s.name}</span>
+      </div>
+    </div>
+    <div class="detail-body">
+      <div class="detail-grid">
+        <div>
+          <div class="sub-section">
+            <div class="section-label">核心思想</div>
+            ${ideas}
+          </div>
+          <div class="sub-section">
+            <div class="section-label">思想关系与碰撞</div>
+            ${rels||'<div style="font-size:12px;color:#aaa;">暂无记录关系</div>'}
+          </div>
+        </div>
+        <div>
+          <div class="sub-section">
+            <div class="section-label">代表作品</div>
+            ${works}
+          </div>
+        </div>
+      </div>
+    </div>`;
+}
+
+window.__sp=function(id){
+  selPhil=id; selSchool=null;
+  renderAll();
+  if(window.innerWidth<700){
+    setTimeout(()=>document.getElementById('detail-panel').scrollIntoView({behavior:'smooth',block:'start'}),50);
+  }
+};
+
+// ── Update sticky top for detail panel ──
+function updateDetailTop(){
+  const h=document.getElementById('sticky-header').offsetHeight;
+  const panel=document.getElementById('detail-panel');
+  if(window.innerWidth>=700) panel.style.top=(h+12)+'px';
+  else panel.style.top='auto';
+}
+
+function renderAll(){
+  renderTabs(); renderTimeline(); renderList(); buildDetail();
+  setTimeout(updateDetailTop, 50);
+}
+
+// ── Boot ──
+window.addEventListener('resize', updateDetailTop);
+
+// Show app after short delay (allow DOM paint)
+setTimeout(()=>{
+  document.getElementById('app').classList.add('visible');
+  renderAll();
+  const loading=document.getElementById('loading');
+  loading.classList.add('hide');
+  setTimeout(()=>loading.style.display='none', 700);
+}, 600);
+
+})();
+</script>
+</body>
+</html>
