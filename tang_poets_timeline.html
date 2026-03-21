@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>唐代诗人图鉴</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600;700&family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#1a1209;--paper:#f5ecd7;--paper-dark:#e8d9bc;--vermillion:#c0392b;--gold:#c8973a;--ink-light:#3d2b1f;--dust:#a89880;--panel-w:390px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:'Noto Serif SC',serif;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23a89880' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/svg%3E");pointer-events:none;z-index:0}
+
+/* NAV */
+.site-header{position:sticky;top:0;z-index:200;background:rgba(245,236,215,0.97);backdrop-filter:blur(8px);border-bottom:1px solid rgba(200,151,58,0.3)}
+.header-inner{display:flex;align-items:center;padding:0 44px}
+.logo{font-family:'ZCOOL XiaoWei',serif;font-size:22px;letter-spacing:.25em;color:var(--ink);padding:16px 0;margin-right:36px;white-space:nowrap}
+.logo span{color:var(--vermillion)}
+.nav-tabs{display:flex}
+.nav-tab{padding:18px 26px;font-size:13px;letter-spacing:.2em;color:var(--dust);cursor:pointer;border:none;background:none;font-family:'Noto Serif SC',serif;position:relative;transition:color .2s}
+.nav-tab::after{content:'';position:absolute;bottom:0;left:50%;right:50%;height:2px;background:var(--vermillion);transition:all .22s cubic-bezier(.4,0,.2,1)}
+.nav-tab:hover{color:var(--ink-light)}
+.nav-tab.active{color:var(--ink)}
+.nav-tab.active::after{left:18%;right:18%}
+.dynasty-badge{margin-left:auto;font-size:11px;color:var(--dust);letter-spacing:.1em}
+.dynasty-badge strong{color:var(--vermillion);font-family:'ZCOOL XiaoWei',serif;font-size:20px;margin-right:4px}
+
+/* PAGES */
+.page{position:relative;z-index:5}
+.page[hidden]{display:none}
+
+/* ═══ PAGE 1: TIMELINE ═══ */
+.tl-legend{display:flex;flex-wrap:wrap;gap:6px 16px;padding:11px 44px;background:rgba(245,236,215,.9);border-bottom:1px solid rgba(168,152,128,.22)}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--ink-light);letter-spacing:.05em}
+.legend-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+.tl-wrap{display:flex;transition:padding-right .38s cubic-bezier(.4,0,.2,1)}
+.tl-wrap.panel-open{padding-right:var(--panel-w)}
+.tl-outer{flex:1;padding:32px 44px 52px;overflow-x:auto}
+.tl-inner{min-width:820px;position:relative}
+.ruler{position:relative;height:42px;margin-bottom:4px}
+.ruler-line{position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,var(--gold),rgba(200,151,58,.18))}
+.tick{position:absolute;bottom:0;transform:translateX(-50%)}
+.tick-line{width:1px;background:var(--gold)}
+.tick-label{font-size:9px;color:var(--dust);position:absolute;bottom:14px;transform:translateX(-50%);white-space:nowrap}
+.poets-grid{display:flex;flex-direction:column;gap:4px;padding-top:4px}
+.poet-row{position:relative;height:36px;display:flex;align-items:center;animation:fadeUp .35s ease both}
+.era-div{position:absolute;top:-4px;width:1px;bottom:-4px;background:rgba(168,152,128,.2);pointer-events:none}
+.era-lbl{position:absolute;top:-20px;font-size:9px;color:var(--dust);letter-spacing:.14em;transform:translateX(-50%);white-space:nowrap}
+.poet-bar{position:absolute;height:32px;border-radius:4px;display:flex;align-items:center;padding:0 9px;cursor:pointer;transition:transform .14s,box-shadow .14s,filter .14s;white-space:nowrap;overflow:hidden;box-shadow:0 2px 7px rgba(0,0,0,.14);border:1px solid rgba(255,255,255,.15)}
+.poet-bar::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.14) 0%,transparent 58%);border-radius:inherit;pointer-events:none}
+.poet-bar:hover{transform:scaleY(1.1) translateY(-1px);box-shadow:0 5px 16px rgba(0,0,0,.26);z-index:10;filter:brightness(1.08)}
+.poet-bar.active{box-shadow:0 0 0 2px var(--gold),0 5px 16px rgba(0,0,0,.26);transform:scaleY(1.1) translateY(-1px);z-index:10}
+.bar-name{font-size:12px;font-weight:600;color:rgba(255,255,255,.95);letter-spacing:.14em;text-shadow:0 1px 3px rgba(0,0,0,.4);pointer-events:none}
+.bar-yr{font-size:9px;color:rgba(255,255,255,.6);margin-left:4px;pointer-events:none}
+
+/* ═══ PAGE 2: SCHOOLS ═══ */
+.schools-layout{display:flex;min-height:calc(100vh - 57px)}
+.schools-sidebar{width:200px;flex-shrink:0;border-right:1px solid rgba(168,152,128,.22);padding:24px 0;position:sticky;top:57px;height:calc(100vh - 57px);overflow-y:auto;background:rgba(245,236,215,.55)}
+.sch-tab{display:flex;align-items:center;gap:9px;padding:10px 22px;cursor:pointer;border:none;background:none;width:100%;text-align:left;font-family:'Noto Serif SC',serif;transition:background .16s}
+.sch-tab:hover{background:rgba(168,152,128,.1)}
+.sch-tab.active{background:rgba(200,151,58,.09)}
+.sch-dot{width:9px;height:9px;border-radius:2px;flex-shrink:0}
+.sch-tab-name{font-size:12px;letter-spacing:.1em;color:var(--ink-light)}
+.sch-tab.active .sch-tab-name{color:var(--ink);font-weight:600}
+.schools-main{flex:1;padding:36px 48px 56px;max-width:920px}
+.sch-title{font-family:'ZCOOL XiaoWei',serif;font-size:36px;letter-spacing:.22em;line-height:1;margin-bottom:6px}
+.sch-period{display:inline-flex;align-items:center;gap:6px;border:1px solid;border-radius:3px;padding:3px 11px;font-size:11px;letter-spacing:.1em;margin-bottom:12px}
+.sch-tagline{font-size:14px;letter-spacing:.07em;font-style:italic;margin-bottom:16px;padding-left:12px;border-left:3px solid;line-height:1.6}
+.sch-desc{font-size:13px;line-height:2.1;color:var(--ink-light);font-weight:300;margin-bottom:32px;max-width:660px}
+.sec-title{font-size:9px;letter-spacing:.28em;color:var(--dust);margin-bottom:14px;padding-bottom:5px;border-bottom:1px solid rgba(168,152,128,.22)}
+.mini-tl{background:rgba(232,217,188,.3);border:1px solid rgba(168,152,128,.18);border-radius:6px;padding:18px 24px 14px;margin-bottom:28px}
+.mini-ruler{position:relative;height:22px;margin-bottom:5px}
+.mini-rl{position:absolute;bottom:0;left:0;right:0;height:1px;background:rgba(200,151,58,.38)}
+.mini-tick{position:absolute;bottom:0;transform:translateX(-50%)}
+.mini-tick-ln{width:1px;background:rgba(200,151,58,.45)}
+.mini-tick-lb{font-size:8px;color:var(--dust);position:absolute;bottom:5px;transform:translateX(-50%);white-space:nowrap}
+.mini-row{position:relative;height:30px;margin-bottom:3px}
+.mini-bar{position:absolute;height:26px;border-radius:3px;display:flex;align-items:center;padding:0 7px;cursor:pointer;white-space:nowrap;transition:filter .15s,transform .15s;box-shadow:0 1px 5px rgba(0,0,0,.14);overflow:hidden}
+.mini-bar:hover{filter:brightness(1.1);transform:scaleY(1.08)}
+.mini-bar::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.14) 0%,transparent 55%);border-radius:inherit;pointer-events:none}
+.mini-bar-n{font-size:11px;font-weight:600;color:rgba(255,255,255,.95);letter-spacing:.08em;pointer-events:none}
+.mini-bar-y{font-size:8px;color:rgba(255,255,255,.58);margin-left:4px;pointer-events:none}
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(188px,1fr));gap:12px}
+.poet-card{border:1px solid rgba(168,152,128,.28);border-radius:6px;padding:14px;cursor:pointer;transition:all .18s;background:rgba(245,236,215,.55);position:relative;overflow:hidden}
+.poet-card:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.1);border-color:rgba(200,151,58,.38)}
+.card-name{font-family:'ZCOOL XiaoWei',serif;font-size:20px;letter-spacing:.18em;margin-bottom:3px}
+.card-yrs{font-size:10px;color:var(--dust);letter-spacing:.07em;margin-bottom:5px}
+.card-alias{font-size:11px;color:var(--ink-light);line-height:1.55;font-weight:300}
+
+/* ═══ PAGE 3: NETWORK ═══ */
+.net-page{display:flex;height:calc(100vh - 57px);overflow:hidden}
+.net-wrap{flex:1;position:relative;background:#0d0905}
+.net-wrap::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 38% 42%,rgba(50,32,12,.9) 0%,#0a0705 100%);pointer-events:none}
+#netSVG{position:absolute;inset:0;width:100%;height:100%}
+.net-toolbar{position:absolute;top:18px;left:18px;z-index:20;padding:14px 16px;background:rgba(10,7,5,.75);border:1px solid rgba(200,151,58,.2);border-radius:6px;backdrop-filter:blur(4px)}
+.net-lg-title{font-size:9px;letter-spacing:.25em;color:rgba(200,151,58,.65);margin-bottom:8px}
+.net-lg-row{display:flex;align-items:center;gap:7px;font-size:10px;color:rgba(245,236,215,.55);letter-spacing:.05em;margin-bottom:5px}
+.net-lg-line{height:2px;width:22px;border-radius:1px}
+.net-hint{position:absolute;bottom:18px;left:50%;transform:translateX(-50%);font-size:10px;color:rgba(245,236,215,.25);letter-spacing:.16em;pointer-events:none;white-space:nowrap}
+
+/* DETAIL PANEL */
+.detail-panel{position:fixed;right:0;top:0;bottom:0;width:var(--panel-w);background:var(--ink);color:var(--paper);transform:translateX(100%);transition:transform .36s cubic-bezier(.4,0,.2,1);z-index:300;display:flex;flex-direction:column;overflow:hidden}
+.detail-panel.open{transform:translateX(0)}
+.panel-top{padding:32px 28px 18px;border-bottom:1px solid rgba(200,151,58,.22);position:relative;flex-shrink:0}
+.panel-top::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--ac,var(--gold))}
+.panel-close{position:absolute;right:18px;top:16px;background:none;border:none;color:var(--dust);font-size:15px;cursor:pointer;padding:4px 8px;transition:color .2s}
+.panel-close:hover{color:var(--paper)}
+.p-name{font-family:'ZCOOL XiaoWei',serif;font-size:36px;letter-spacing:.22em;line-height:1;margin-bottom:4px}
+.p-alias{font-size:11px;color:var(--dust);letter-spacing:.13em;margin-bottom:9px}
+.p-yrs{display:inline-flex;align-items:center;gap:5px;background:rgba(200,151,58,.1);border:1px solid rgba(200,151,58,.22);border-radius:3px;padding:4px 10px;font-size:11px;color:var(--gold);letter-spacing:.09em}
+.panel-body{flex:1;overflow-y:auto;padding:18px 28px 28px;scrollbar-width:thin;scrollbar-color:rgba(200,151,58,.22) transparent}
+.p-badge{display:inline-block;padding:3px 9px;border-radius:2px;font-size:10px;letter-spacing:.13em;margin-bottom:18px;color:#fff}
+.p-sec{font-size:9px;letter-spacing:.28em;color:var(--dust);margin-bottom:7px;padding-bottom:4px;border-bottom:1px solid rgba(168,152,128,.16)}
+.p-bio{font-size:13px;line-height:2.1;color:rgba(245,236,215,.8);margin-bottom:22px;font-weight:300}
+.works-list{list-style:none;display:flex;flex-direction:column;gap:9px}
+.work-item{border-left:2px solid var(--ac,var(--gold));padding:8px 11px;background:rgba(255,255,255,.04);border-radius:0 4px 4px 0}
+.work-title{font-size:13px;font-weight:600;color:var(--paper);letter-spacing:.09em;margin-bottom:3px}
+.work-lines{font-size:11px;color:var(--dust);line-height:1.9;font-style:italic}
+.rel-list{display:flex;flex-direction:column;gap:8px;margin-top:6px}
+.rel-item{padding:8px 11px;border-radius:4px;border:1px solid rgba(168,152,128,.18);background:rgba(255,255,255,.04)}
+.rel-type{font-size:9px;letter-spacing:.18em;margin-bottom:2px;font-weight:600}
+.rel-name{font-size:13px;letter-spacing:.1em;color:var(--paper);margin-bottom:3px;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.rel-desc{font-size:11px;color:var(--dust);line-height:1.7;font-weight:300}
+
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(168,152,128,.32);border-radius:10px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <div class="logo">唐<span>诗</span>图鉴</div>
+    <nav class="nav-tabs">
+      <button class="nav-tab active" data-page="timeline">时间轴</button>
+      <button class="nav-tab" data-page="schools">诗派</button>
+      <button class="nav-tab" data-page="network">关系网络</button>
+    </nav>
+    <div class="dynasty-badge"><strong>唐</strong>618 — 907 AD</div>
+  </div>
+</header>
+
+<!-- PAGE 1: TIMELINE -->
+<div id="page-timeline" class="page">
+  <div class="tl-legend" id="tlLegend"></div>
+  <div class="tl-wrap" id="tlWrap">
+    <div class="tl-outer">
+      <div class="tl-inner" id="tlInner">
+        <div class="ruler" id="tlRuler"></div>
+        <div class="poets-grid" id="tlGrid"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 2: SCHOOLS -->
+<div id="page-schools" class="page" hidden>
+  <div class="schools-layout">
+    <aside class="schools-sidebar" id="schSidebar"></aside>
+    <main class="schools-main" id="schMain"></main>
+  </div>
+</div>
+
+<!-- PAGE 3: NETWORK -->
+<div id="page-network" class="page" hidden>
+  <div class="net-page">
+    <div class="net-wrap" id="netWrap">
+      <svg id="netSVG"></svg>
+      <div class="net-toolbar">
+        <div class="net-lg-title">关系类型</div>
+        <div class="net-lg-row"><div class="net-lg-line" style="background:#e8a045"></div>挚友 / 好友</div>
+        <div class="net-lg-row"><div class="net-lg-line" style="background:#5ba8d4;height:0;border-top:2px dashed #5ba8d4"></div>师徒 / 提携</div>
+        <div class="net-lg-row"><div class="net-lg-line" style="background:#7ac47a"></div>同仁 / 并称</div>
+        <div class="net-lg-row"><div class="net-lg-line" style="background:#c47aad;height:0;border-top:2px dotted #c47aad"></div>影响 / 传承</div>
+        <div class="net-lg-row"><div class="net-lg-line" style="background:#d4c45b"></div>赏识 / 知遇</div>
+      </div>
+      <div class="net-hint">点击诗人节点 · 查看关系详情 · 可拖拽移动</div>
+    </div>
+  </div>
+</div>
+
+<!-- SHARED DETAIL PANEL -->
+<div class="detail-panel" id="detailPanel">
+  <div class="panel-top" id="panelTop">
+    <button class="panel-close" id="panelClose">✕</button>
+    <div class="p-name" id="pName"></div>
+    <div class="p-alias" id="pAlias"></div>
+    <div class="p-yrs" id="pYrs"></div>
+  </div>
+  <div class="panel-body" id="pBody"></div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════
+const TS=618,TE=907;
+
+const SCHOOLS={
+  '初唐新声':{color:'#6A5A9B',period:'618 — 712',tagline:'破六朝余风，开盛唐先声',
+    desc:'初唐诗歌处于从南北朝宫体诗向盛唐诗风的过渡期。"初唐四杰"王勃、杨炯、卢照邻、骆宾王高举革新旗帜，反对齐梁绮靡浮艳之风，追求壮阔豪迈的格调。陈子昂进一步提倡"汉魏风骨"，为盛唐诗歌的繁荣奠定了基础。这一时期诗歌题材大幅扩大，感情更为真挚，语言逐渐走向清新刚健，为盛唐的全面繁荣做好了铺垫。',
+    poets:['王勃','骆宾王','陈子昂']},
+  '山水田园':{color:'#3A6B8B',period:'680 — 800',tagline:'诗中有画，画中有诗',
+    desc:'山水田园诗派上承陶渊明、谢灵运的传统，以自然山水、田园生活为主要描写对象，追求清淡自然、空灵幽远的艺术境界，融入禅意与老庄思想。王维被苏轼誉为"诗中有画，画中有诗"，孟浩然则以清旷闲适著称，二人并称"王孟"。韦应物与刘长卿延续了这一传统，使山水田园诗在中唐继续繁荣。',
+    poets:['贺知章','张九龄','孟浩然','王维','韦应物','刘长卿']},
+  '边塞豪情':{color:'#4A7B5A',period:'698 — 780',tagline:'黄沙百战穿金甲，不破楼兰终不还',
+    desc:'盛唐边塞诗派是唐代诗歌最具阳刚之气的流派，以描写边疆军旅生活、大漠风光和保家卫国的豪情壮志为主。高适、岑参是最杰出的代表，并称"高岑"。王昌龄的七绝短小精悍，情感深沉，有"七绝圣手"之誉。这类诗歌反映了唐帝国强大的军事实力和开拓进取的时代精神，充满阳刚豪迈之气。',
+    poets:['王昌龄','高适','岑参']},
+  '诗仙浪漫':{color:'#8B3A3A',period:'701 — 762',tagline:'天生我材必有用，千金散尽还复来',
+    desc:'以李白为代表的浪漫主义诗歌，汲取道家自由超脱的精神与屈原《离骚》的瑰丽想象，形成了独一无二的诗歌风格。李白诗歌飘逸奔放，想象奇特，语言豪迈，善用夸张与比喻，将个人自由精神与宇宙宏大气象融为一体。是中国浪漫主义诗歌的最高峰，后世无人能及。',
+    poets:['李白']},
+  '诗圣写实':{color:'#7A5A2A',period:'712 — 770',tagline:'安得广厦千万间，大庇天下寒士俱欢颜',
+    desc:'以杜甫为核心代表的现实主义诗歌，将个人命运与国家兴衰紧密相连，以诗歌记录历史，真实反映社会矛盾和人民疾苦。杜甫的诗被后人称为"诗史"，其沉郁顿挫的风格，严谨的格律技巧，深厚的人道主义关怀，确立了中国现实主义诗歌的最高标准。',
+    poets:['杜甫']},
+  '新乐府运动':{color:'#5A7A3A',period:'770 — 850',tagline:'文章合为时而著，歌诗合为事而作',
+    desc:'中唐新乐府运动由白居易、元稹倡导，以"文章合为时而著，歌诗合为事而作"为旗帜，主张诗歌应反映现实，为社会改革服务。语言平易通俗，批判时弊，关注民生。刘禹锡人称"诗豪"，为中唐诗坛注入了乐观豁达的另一股清流。',
+    poets:['白居易','元稹','刘禹锡']},
+  '韩孟奇崛':{color:'#3A7A7A',period:'750 — 830',tagline:'惟陈言之务去，以文为诗',
+    desc:'韩孟诗派以韩愈、孟郊为代表，与柳宗元共同推动古文运动。韩愈提出"陈言务去"，追求奇崛险峻的诗风，"以文为诗"，将散文笔法引入诗歌创作。孟郊诗风苦涩幽深，其《游子吟》令人动容。这一诗派注重独创性，与同时代的白居易流派形成鲜明对比，共同构成中唐诗歌的多元面貌。',
+    poets:['韩愈','孟郊','柳宗元']},
+  '绮丽晚唐':{color:'#7A3A7A',period:'790 — 880',tagline:'锦瑟无端五十弦，一弦一柱思华年',
+    desc:'晚唐诗歌在帝国衰落的背景下，转向个人内心世界的探索，形成了瑰丽、朦胧、忧郁的美学风格。李贺以"鬼才"著称；杜牧诗风俊爽，有历史感；李商隐诗境朦胧，情感缠绵悱恻，无题诗是爱情诗的巅峰；温庭筠开创花间词派，影响深远。以精致艺术消解末世悲凉，自成一格。',
+    poets:['李贺','杜牧','李商隐','温庭筠']},
+};
+
+const POETS=[
+  {name:'王勃',alias:'字子安，"初唐四杰"之首',born:650,died:676,school:'初唐新声',
+   bio:'初唐文学家，与杨炯、卢照邻、骆宾王并称"初唐四杰"。天才早慧，六岁能文，九岁读颜师古《汉书注》。因才华横溢而命运多舛，二十六岁溺水而亡，英年早逝。其文学成就在于骈文与五言律诗，开盛唐诗歌先声。',
+   works:[{t:'《滕王阁序》',l:'落霞与孤鹜齐飞，秋水共长天一色。'},{t:'《送杜少府之任蜀州》',l:'海内存知己，天涯若比邻。\n无为在歧路，儿女共沾巾。'},{t:'《山中》',l:'长江悲已滞，万里念将归。\n况属高风晚，山山黄叶飞。'}]},
+  {name:'骆宾王',alias:'字观光，"初唐四杰"之一',born:640,died:684,school:'初唐新声',
+   bio:'初唐诗人，七岁能诗，有神童之称。曾参与徐敬业讨伐武则天，撰写著名的《为徐敬业讨武曌檄》，措辞犀利，武则天读后拍案叫绝。兵败后下落不明，或亡或遁。',
+   works:[{t:'《咏鹅》',l:'鹅鹅鹅，曲项向天歌。\n白毛浮绿水，红掌拨清波。'},{t:'《在狱咏蝉》',l:'西陆蝉声唱，南冠客思深。\n不堪玄鬓影，来对白头吟。'}]},
+  {name:'陈子昂',alias:'字伯玉，初唐诗文革新先驱',born:661,died:702,school:'初唐新声',
+   bio:'唐代文学家、诗人，高倡汉魏风骨，反对齐梁绮靡之风，其诗风刚健有力，充满建功立业的豪情。《登幽州台歌》以苍茫悲凉著称，为盛唐边塞诗风的形成奠定了基础。',
+   works:[{t:'《登幽州台歌》',l:'前不见古人，后不见来者。\n念天地之悠悠，独怆然而涕下。'},{t:'《感遇》其三十八',l:'朔风吹海树，萧条边已秋。\n亭上谁家子，哀哀明月楼。'}]},
+  {name:'贺知章',alias:'字季真，号四明狂客',born:659,died:744,school:'山水田园',
+   bio:'唐代诗人、书法家，性格旷达，好酒，与李白、张旭等人并称"饮中八仙"。八十六岁时告老还乡，写下脍炙人口的《回乡偶书》。他是李白的伯乐，首先发现其才华并称之为"谪仙人"。',
+   works:[{t:'《回乡偶书》',l:'少小离家老大回，乡音无改鬓毛衰。\n儿童相见不相识，笑问客从何处来。'},{t:'《咏柳》',l:'碧玉妆成一树高，万条垂下绿丝绦。\n不知细叶谁裁出，二月春风似剪刀。'}]},
+  {name:'张九龄',alias:'字子寿，岭南第一名相',born:678,died:740,school:'山水田园',
+   bio:'唐代著名政治家、文学家，开元年间官至宰相，为政清廉，敢于直谏。他曾力阻玄宗重用安禄山，可惜未被采纳，晚年被李林甫排挤出朝。其诗风清淡自然，格调高远。',
+   works:[{t:'《望月怀远》',l:'海上生明月，天涯共此时。\n情人怨遥夜，竟夕起相思。'},{t:'《感遇》其一',l:'兰叶春葳蕤，桂华秋皎洁。\n欣欣此生意，自尔为佳节。'}]},
+  {name:'孟浩然',alias:'字浩然，山水田园诗派先驱',born:689,died:740,school:'山水田园',
+   bio:'唐代著名山水田园诗人，与王维并称"王孟"。一生未仕，游历天下，以诗名动天下。李白赞其"吾爱孟夫子，风流天下闻"。其诗清新自然，意境淡远，代表作《春晓》妇孺皆知。',
+   works:[{t:'《春晓》',l:'春眠不觉晓，处处闻啼鸟。\n夜来风雨声，花落知多少。'},{t:'《宿建德江》',l:'移舟泊烟渚，日暮客愁新。\n野旷天低树，江清月近人。'},{t:'《过故人庄》',l:'故人具鸡黍，邀我至田家。\n绿树村边合，青山郭外斜。'}]},
+  {name:'王昌龄',alias:'字少伯，七绝圣手',born:698,died:756,school:'边塞豪情',
+   bio:'唐代著名边塞诗人，被誉为"七绝圣手"。其边塞诗气势豪迈，语言简练而意蕴深远。《出塞》被誉为"唐人绝句压卷之作"。安史之乱爆发后被人杀害，令人惋惜。',
+   works:[{t:'《出塞》',l:'秦时明月汉时关，万里长征人未还。\n但使龙城飞将在，不教胡马度阴山。'},{t:'《从军行》其四',l:'青海长云暗雪山，孤城遥望玉门关。\n黄沙百战穿金甲，不破楼兰终不还。'},{t:'《芙蓉楼送辛渐》',l:'寒雨连江夜入吴，平明送客楚山孤。\n洛阳亲友如相问，一片冰心在玉壶。'}]},
+  {name:'王维',alias:'字摩诘，诗佛，亦善画',born:699,died:761,school:'山水田园',
+   bio:'唐代著名诗人、画家，因笃信佛教，有"诗佛"之称。苏轼评价其"味摩诘之诗，诗中有画；观摩诘之画，画中有诗"。晚年隐居辋川别业，过着半官半隐的生活。',
+   works:[{t:'《山居秋暝》',l:'空山新雨后，天气晚来秋。\n明月松间照，清泉石上流。'},{t:'《送元二使安西》',l:'渭城朝雨浥轻尘，客舍青青柳色新。\n劝君更尽一杯酒，西出阳关无故人。'},{t:'《鸟鸣涧》',l:'人闲桂花落，夜静春山空。\n月出惊山鸟，时鸣春涧中。'}]},
+  {name:'李白',alias:'字太白，号青莲居士，诗仙',born:701,died:762,school:'诗仙浪漫',
+   bio:'唐代伟大的浪漫主义诗人，被后人誉为"诗仙"，与杜甫并称"李杜"。其诗豪放飘逸，想象奇绝，善用夸张与比喻。一生游历天下，仗剑行侠，饮酒作诗。曾被唐玄宗召入宫廷赐翰林学士，因性格放浪不羁而被疏远，留有诗近千首。',
+   works:[{t:'《静夜思》',l:'床前明月光，疑是地上霜。\n举头望明月，低头思故乡。'},{t:'《将进酒》',l:'君不见，黄河之水天上来，奔流到海不复回。\n人生得意须尽欢，莫使金樽空对月。'},{t:'《望庐山瀑布》',l:'飞流直下三千尺，疑是银河落九天。'},{t:'《蜀道难》',l:'噫吁嚱，危乎高哉！\n蜀道之难，难于上青天。'}]},
+  {name:'高适',alias:'字达夫，边塞诗派代表',born:702,died:765,school:'边塞豪情',
+   bio:'唐代著名边塞诗人，与岑参并称"高岑"。其诗气魄雄浑，风格豪放悲壮，反映了边塞将士的英勇与艰辛。晚年因平定叛乱有功而封侯，是唐代诗人中少数以军功封侯者。',
+   works:[{t:'《燕歌行》',l:'汉家烟尘在东北，汉将辞家破残贼。\n男儿本自重横行，天子非常赐颜色。'},{t:'《别董大》',l:'千里黄云白日曛，北风吹雁雪纷纷。\n莫愁前路无知己，天下谁人不识君。'}]},
+  {name:'杜甫',alias:'字子美，号少陵野老，诗圣',born:712,died:770,school:'诗圣写实',
+   bio:'唐代伟大的现实主义诗人，被后人誉为"诗圣"，其诗被称为"诗史"。他忧国忧民，一生颠沛流离，亲历安史之乱，以诗歌记录了唐朝由盛转衰的历史。其诗语言精炼，格律严谨，沉郁顿挫，感情深厚，留有诗一千四百余首。',
+   works:[{t:'《春望》',l:'国破山河在，城春草木深。\n感时花溅泪，恨别鸟惊心。'},{t:'《茅屋为秋风所破歌》',l:'安得广厦千万间，大庇天下寒士俱欢颜。'},{t:'《登高》',l:'无边落木萧萧下，不尽长江滚滚来。\n万里悲秋常作客，百年多病独登台。'},{t:'《石壕吏》',l:'暮投石壕村，有吏夜捉人。\n老翁逾墙走，老妇出门看。'}]},
+  {name:'岑参',alias:'字不详，盛唐边塞诗人',born:715,died:770,school:'边塞豪情',
+   bio:'唐代著名边塞诗人，与高适并称"高岑"。两度出塞，在边疆生活多年，对西北边地的自然风光与将士生涯有深刻体验。其诗想象丰富，色彩绚丽，语言奇峻，充满浪漫主义精神。',
+   works:[{t:'《白雪歌送武判官归京》',l:'忽如一夜春风来，千树万树梨花开。\n山回路转不见君，雪上空留马行处。'},{t:'《逢入京使》',l:'故园东望路漫漫，双袖龙钟泪不干。\n马上相逢无纸笔，凭君传语报平安。'}]},
+  {name:'韦应物',alias:'字义博，仕隐兼修',born:737,died:792,school:'山水田园',
+   bio:'唐代诗人，早年以侠气著称，后折节读书，登进士第。其诗风格清雅闲淡，多写自然山水与田园生活，与柳宗元并称"韦柳"，与王维、孟浩然、柳宗元合称"王孟韦柳"。',
+   works:[{t:'《滁州西涧》',l:'独怜幽草涧边生，上有黄鹂深树鸣。\n春潮带雨晚来急，野渡无人舟自横。'},{t:'《寄李儋元锡》',l:'去年花里逢君别，今日花开已一年。\n世事茫茫难自料，春愁黯黯独成眠。'}]},
+  {name:'刘长卿',alias:'字文房，五言长城',born:726,died:786,school:'山水田园',
+   bio:'唐代诗人，自号"五言长城"，以五言律诗见长。仕途坎坷，两次被贬，晚年流寓江南。其诗风格清幽婉约，意境深远，善于以景寓情，抒发怀才不遇之感。',
+   works:[{t:'《逢雪宿芙蓉山主人》',l:'日暮苍山远，天寒白屋贫。\n柴门闻犬吠，风雪夜归人。'},{t:'《送灵澈上人》',l:'苍苍竹林寺，杳杳钟声晚。\n荷笠带斜阳，青山独归远。'}]},
+  {name:'韩愈',alias:'字退之，唐宋八大家之首',born:768,died:824,school:'韩孟奇崛',
+   bio:'唐代著名文学家、思想家、政治家，唐宋八大家之首，古文运动的倡导者。力主复兴儒学，反对佛老之说。其文章气势磅礴；其诗以文为诗，险怪奇崛，开创全新诗歌风格。曾因谏迎佛骨被贬潮州。',
+   works:[{t:'《春雪》',l:'新年都未有芳华，二月初惊见草芽。\n白雪却嫌春色晚，故穿庭树作飞花。'},{t:'《左迁至蓝关示侄孙湘》',l:'一封朝奏九重天，夕贬潮州路八千。\n云横秦岭家何在？雪拥蓝关马不前。'},{t:'《早春呈水部张十八员外》',l:'天街小雨润如酥，草色遥看近却无。\n最是一年春好处，绝胜烟柳满皇都。'}]},
+  {name:'白居易',alias:'字乐天，号香山居士，诗魔',born:772,died:846,school:'新乐府运动',
+   bio:'唐代伟大的现实主义诗人，新乐府运动的倡导者，自称"诗魔"。主张"文章合为时而著，歌诗合为事而作"。其诗语言平易近人，相传写诗后会读给老妪听，直到人人皆懂为止。留有诗近三千首。',
+   works:[{t:'《长恨歌》',l:'在天愿作比翼鸟，在地愿为连理枝。\n天长地久有时尽，此恨绵绵无绝期。'},{t:'《琵琶行》',l:'同是天涯沦落人，相逢何必曾相识。\n别有幽愁暗恨生，此时无声胜有声。'},{t:'《赋得古原草送别》',l:'离离原上草，一岁一枯荣。\n野火烧不尽，春风吹又生。'}]},
+  {name:'刘禹锡',alias:'字梦得，诗豪',born:772,died:842,school:'新乐府运动',
+   bio:'唐代著名诗人、政治家，被称为"诗豪"。参与永贞革新失败后被贬郎州长达十年，但始终保持乐观豁达的心态。其民歌风格诗歌婉转悠扬，《竹枝词》脍炙人口。',
+   works:[{t:'《陋室铭》',l:'山不在高，有仙则名。水不在深，有龙则灵。\n斯是陋室，惟吾德馨。'},{t:'《酬乐天扬州初逢席上见赠》',l:'沉舟侧畔千帆过，病树前头万木春。\n今日听君歌一曲，暂凭杯酒长精神。'},{t:'《乌衣巷》',l:'朱雀桥边野草花，乌衣巷口夕阳斜。\n旧时王谢堂前燕，飞入寻常百姓家。'}]},
+  {name:'元稹',alias:'字微之，与白居易并称"元白"',born:779,died:831,school:'新乐府运动',
+   bio:'唐代著名诗人，与白居易共同倡导新乐府运动，并称"元白"。其悼亡诗《遣悲怀》情感真挚，被誉为古今悼亡诗第一。传奇小说《莺莺传》（即《西厢记》的原型）亦出自其手。',
+   works:[{t:'《遣悲怀》其三',l:'闲坐悲君亦自悲，百年都是几多时。\n邓攸无子寻知命，潘岳悼亡犹费词。'},{t:'《离思》',l:'曾经沧海难为水，除却巫山不是云。\n取次花丛懒回顾，半缘修道半缘君。'}]},
+  {name:'柳宗元',alias:'字子厚，与韩愈并称"韩柳"',born:773,died:819,school:'韩孟奇崛',
+   bio:'唐代著名文学家、哲学家，唐宋八大家之一，与韩愈并称"韩柳"。参与永贞革新失败后被贬永州十年，写下著名的"永州八记"。其文章自然清新，诗歌冷峻幽深，寄托孤独与愁苦。',
+   works:[{t:'《江雪》',l:'千山鸟飞绝，万径人踪灭。\n孤舟蓑笠翁，独钓寒江雪。'},{t:'《登柳州城楼寄漳汀封连四州》',l:'城上高楼接大荒，海天愁思正茫茫。\n惊风乱飐芙蓉水，密雨斜侵薜荔墙。'}]},
+  {name:'孟郊',alias:'字东野，苦吟诗人',born:751,died:814,school:'韩孟奇崛',
+   bio:'唐代著名诗人，与韩愈并称"韩孟"，与贾岛并称"郊寒岛瘦"。一生贫寒坎坷，屡试不第，五十岁才中进士。其诗多写穷愁困苦之情，风格奇特险峻，《游子吟》令无数游子潸然泪下。',
+   works:[{t:'《游子吟》',l:'慈母手中线，游子身上衣。\n临行密密缝，意恐迟迟归。\n谁言寸草心，报得三春晖。'},{t:'《登科后》',l:'昔日龌龊不足夸，今朝放荡思无涯。\n春风得意马蹄疾，一日看尽长安花。'}]},
+  {name:'李贺',alias:'字长吉，诗鬼',born:790,died:816,school:'绮丽晚唐',
+   bio:'唐代著名诗人，被称为"诗鬼"。天才早慧，七岁能诗，因避父讳不得参加科举，27岁英年早逝。其诗想象奇特诡谲，意象瑰丽，语言险峻，充满浪漫色彩与奇异幻想，自成一派。',
+   works:[{t:'《雁门太守行》',l:'黑云压城城欲摧，甲光向日金鳞开。\n角声满天秋色里，塞上燕脂凝夜紫。'},{t:'《李凭箜篌引》',l:'吴丝蜀桐张高秋，空山凝云颓不流。\n女娲炼石补天处，石破天惊逗秋雨。'}]},
+  {name:'杜牧',alias:'字牧之，号樊川居士，小杜',born:803,died:852,school:'绮丽晚唐',
+   bio:'唐代著名诗人，与李商隐并称"小李杜"。出身豪门，才华横溢，二十三岁写出《阿房宫赋》而震动文坛。其诗风俊爽，清丽自然，既有豪迈之气，又有婉约之风，留下大量咏史经典之作。',
+   works:[{t:'《清明》',l:'清明时节雨纷纷，路上行人欲断魂。\n借问酒家何处有，牧童遥指杏花村。'},{t:'《泊秦淮》',l:'烟笼寒水月笼沙，夜泊秦淮近酒家。\n商女不知亡国恨，隔江犹唱后庭花。'},{t:'《赤壁》',l:'折戟沉沙铁未销，自将磨洗认前朝。\n东风不与周郎便，铜雀春深锁二乔。'}]},
+  {name:'李商隐',alias:'字义山，号玉谿生，小李',born:813,died:858,school:'绮丽晚唐',
+   bio:'唐代著名诗人，与杜牧并称"小李杜"，与温庭筠并称"温李"。其诗构思精巧，意境朦胧，情感深沉，以无题诗最为著名，是晚唐诗歌的巅峰之作。一生夹在牛李党争之间，仕途不顺，空怀壮志。',
+   works:[{t:'《锦瑟》',l:'锦瑟无端五十弦，一弦一柱思华年。\n此情可待成追忆？只是当时已惘然。'},{t:'《无题》',l:'相见时难别亦难，东风无力百花残。\n春蚕到死丝方尽，蜡炬成灰泪始干。'},{t:'《夜雨寄北》',l:'君问归期未有期，巴山夜雨涨秋池。\n何当共剪西窗烛，却话巴山夜雨时。'}]},
+  {name:'温庭筠',alias:'字飞卿，花间词派鼻祖',born:812,died:870,school:'绮丽晚唐',
+   bio:'唐代著名诗人、词人，是花间词派的鼻祖，对后世宋词影响深远。才华横溢，屡试不第，一生穷困潦倒。其词语言艳丽，意象丰富，开创了以女性视角写闺怨相思的词风，被后世尊为"花间鼻祖"。',
+   works:[{t:'《菩萨蛮》',l:'小山重叠金明灭，鬓云欲度香腮雪。\n懒起画蛾眉，弄妆梳洗迟。'},{t:'《望江南》',l:'梳洗罢，独倚望江楼。\n过尽千帆皆不是，斜晖脉脉水悠悠，肠断白蘋洲。'}]},
+];
+
+const PM={};POETS.forEach(p=>PM[p.name]=p);
+
+const RT={
+  friend:{label:'挚友 / 好友',color:'#e8a045',dash:'none'},
+  mentor:{label:'师徒 / 提携',color:'#5ba8d4',dash:'6,4'},
+  colleague:{label:'同仁 / 并称',color:'#7ac47a',dash:'none'},
+  influence:{label:'影响 / 传承',color:'#c47aad',dash:'3,4'},
+  patron:{label:'赏识 / 知遇',color:'#d4c45b',dash:'none'},
+};
+
+const RELS=[
+  {s:'李白',t:'杜甫',type:'friend',d:'盛唐至交，744年相遇于洛阳，结为挚友。杜甫曾作《梦李白》《赠李白》，李白亦有《沙丘城下寄杜甫》，两人相互仰慕，情谊深厚。'},
+  {s:'李白',t:'孟浩然',type:'friend',d:'李白深慕孟浩然，作《赠孟浩然》："吾爱孟夫子，风流天下闻"，孟浩然是其精神偶像与挚友。'},
+  {s:'贺知章',t:'李白',type:'patron',d:'贺知章初见李白即惊呼"谪仙人也"，引荐入朝，对李白有知遇之恩，是其最重要的伯乐。'},
+  {s:'韩愈',t:'孟郊',type:'mentor',d:'韩愈多次举荐提携孟郊，两人诗风相近，被后世并称"韩孟"，亦师亦友，情谊深厚。'},
+  {s:'韩愈',t:'柳宗元',type:'colleague',d:'古文运动同仁，共同反对六朝骈文，倡导复古散文，相互推重激励，并称"韩柳"。'},
+  {s:'白居易',t:'元稹',type:'friend',d:'莫逆之交，共倡新乐府运动，并称"元白"，书信往来极多，情谊深厚一生不渝，是唐代文坛的友情佳话。'},
+  {s:'白居易',t:'刘禹锡',type:'friend',d:'晚年挚友，相互酬唱，白居易曾作《醉赠刘二十八使君》，并为其晚年作伴，情谊深厚。'},
+  {s:'王维',t:'孟浩然',type:'friend',d:'山水田园诗派同仁，后世并称"王孟"，互相赏识，同为盛唐田园诗之双峰。'},
+  {s:'杜牧',t:'李商隐',type:'colleague',d:'晚唐文坛并称"小李杜"，同时代诗坛名家，风格互补，一雄健一朦胧，相互尊重。'},
+  {s:'李商隐',t:'温庭筠',type:'friend',d:'同代诗人，并称"温李"，皆以绮丽词风著称，对晚唐五代词风影响深远。'},
+  {s:'高适',t:'岑参',type:'colleague',d:'盛唐边塞诗两大旗手，并称"高岑"，题材相近，风格各异，一沉雄一瑰丽，同为边塞诗派旗帜。'},
+  {s:'高适',t:'李白',type:'friend',d:'天宝年间相遇于梁宋，同游漫饮，互赠诗篇，结为好友。'},
+  {s:'高适',t:'杜甫',type:'friend',d:'与李白同游梁宋时结识杜甫，三人相交，高适后来亦曾施以援手帮助杜甫。'},
+  {s:'李白',t:'王昌龄',type:'friend',d:'相互仰慕，交情深厚，王昌龄被贬时李白专门作《闻王昌龄左迁龙标遥有此寄》以寄情谊。'},
+  {s:'杜甫',t:'白居易',type:'influence',d:'白居易深受杜甫现实主义诗风影响，视杜甫为偶像，继承并发展了新乐府写实精神。'},
+  {s:'李贺',t:'李商隐',type:'influence',d:'李商隐深受李贺奇崛瑰丽诗风影响，诗中多有李贺意象与笔法，是其精神上的传承者。'},
+  {s:'元稹',t:'刘禹锡',type:'colleague',d:'中唐同朝为官，同经贬谪之苦，互有往来唱和，同情相怜，是志同道合的同僚。'},
+  {s:'王维',t:'王昌龄',type:'colleague',d:'同在长安为官，诗风互有影响，同为盛唐诗坛中坚，相互仰重，时有往来。'},
+  {s:'孟浩然',t:'王昌龄',type:'friend',d:'孟浩然晚年与王昌龄相识结交，王昌龄探望孟浩然时孟浩然竟因贪食鲜物发病辞世，令人唏嘘。'},
+  {s:'杜甫',t:'韩愈',type:'influence',d:'杜甫诗歌技巧与忧国精神深刻影响了韩愈，韩愈在多篇文章中高度推崇杜甫，视其为楷模。'},
+  {s:'白居易',t:'李商隐',type:'patron',d:'相传白居易曾表示希望来世投胎做他的儿子，对李商隐的才华极为赏识，给予认可与鼓励。'},
+  {s:'柳宗元',t:'刘禹锡',type:'friend',d:'共同参与永贞革新，同遭贬谪，同甘共苦，并称"刘柳"，是患难与共的挚友。'},
+];
+
+// ═══════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════
+let curPage='timeline',netReady=false,activeBar=null;
+
+document.querySelectorAll('.nav-tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    const p=tab.dataset.page;
+    if(p===curPage)return;
+    document.querySelectorAll('.nav-tab').forEach(t=>t.classList.toggle('active',t===tab));
+    document.querySelectorAll('.page').forEach(pg=>pg.hidden=(pg.id!=='page-'+p));
+    curPage=p;
+    closePanel();
+    if(p==='network'&&!netReady){initNet();netReady=true;}
+  });
+});
+
+// ═══════════════════════════════════════════════
+// SHARED PANEL
+// ═══════════════════════════════════════════════
+function openPanel(poet,ac,showRels=false){
+  if(!poet)return;
+  document.getElementById('panelTop').style.setProperty('--ac',ac);
+  document.getElementById('pName').textContent=poet.name;
+  document.getElementById('pAlias').textContent=poet.alias;
+  document.getElementById('pYrs').textContent=`${poet.born} AD — ${poet.died} AD · 享年 ${poet.died-poet.born} 岁`;
+  const sc=SCHOOLS[poet.school];
+  let h=`<div class="p-badge" style="background:${sc.color}">${poet.school}</div>`;
+  h+=`<div class="p-sec">生平简介</div><div class="p-bio">${poet.bio}</div>`;
+  h+=`<div class="p-sec">代表作品</div><ul class="works-list">`;
+  poet.works.forEach(w=>{
+    h+=`<li class="work-item" style="--ac:${ac}"><div class="work-title">${w.t}</div><div class="work-lines">${w.l.replace(/\n/g,'<br>')}</div></li>`;
+  });
+  h+=`</ul>`;
+  if(showRels){
+    const rs=RELS.filter(r=>r.s===poet.name||r.t===poet.name);
+    if(rs.length){
+      h+=`<div class="p-sec" style="margin-top:22px">人际关系</div><div class="rel-list">`;
+      rs.forEach(r=>{
+        const other=r.s===poet.name?r.t:r.s;
+        const rt=RT[r.type];
+        const dir=r.s===poet.name?'→ ':'← ';
+        h+=`<div class="rel-item"><div class="rel-type" style="color:${rt.color}">${rt.label}</div>
+          <div class="rel-name" onclick="clickRelPoet('${other}')">${dir}${other}</div>
+          <div class="rel-desc">${r.d}</div></div>`;
+      });
+      h+=`</div>`;
+    }
+  }
+  document.getElementById('pBody').innerHTML=h;
+  document.getElementById('detailPanel').classList.add('open');
+  if(curPage==='timeline')document.getElementById('tlWrap').classList.add('panel-open');
+}
+
+window.clickRelPoet=function(name){
+  const p=PM[name];if(!p)return;
+  const sc=SCHOOLS[p.school];
+  openPanel(p,sc.color,true);
+  if(curPage==='network'){
+    const n=netNodes.find(nd=>nd.id===name);
+    if(n)selectNode(n);
+  }
+};
+
+function closePanel(){
+  document.getElementById('detailPanel').classList.remove('open');
+  document.getElementById('tlWrap').classList.remove('panel-open');
+  if(activeBar){activeBar.classList.remove('active');activeBar=null;}
+  resetHighlight();
+}
+document.getElementById('panelClose').addEventListener('click',closePanel);
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closePanel();});
+
+// ═══════════════════════════════════════════════
+// PAGE 1 — TIMELINE
+// ═══════════════════════════════════════════════
+(function(){
+  const TOT=TE-TS;
+  function p(y){return ((y-TS)/TOT*100).toFixed(3)+'%';}
+
+  // legend
+  const leg=document.getElementById('tlLegend');
+  Object.entries(SCHOOLS).forEach(([n,s])=>{
+    const d=document.createElement('div');d.className='legend-item';
+    d.innerHTML=`<div class="legend-dot" style="background:${s.color}"></div>${n}`;
+    leg.appendChild(d);
+  });
+
+  // ruler
+  const ruler=document.getElementById('tlRuler');
+  const rl=document.createElement('div');rl.className='ruler-line';ruler.appendChild(rl);
+  for(let y=TS;y<=TE;y+=10){
+    const t=document.createElement('div');t.className='tick';t.style.left=p(y);
+    const tl=document.createElement('div');tl.className='tick-line';
+    tl.style.height=(y%50===0||y===TS||y===TE)?'12px':'5px';
+    t.appendChild(tl);
+    if(y%50===0||y===TS||y===TE){
+      const lb=document.createElement('div');lb.className='tick-label';lb.textContent=y;
+      t.appendChild(lb);
+    }
+    ruler.appendChild(t);
+  }
+
+  // assign rows
+  const sorted=[...POETS].sort((a,b)=>a.born-b.born);
+  const rowEnds=[];
+  sorted.forEach(po=>{
+    let r=0;
+    while(rowEnds[r]!==undefined&&rowEnds[r]>po.born-4)r++;
+    po._r=r;rowEnds[r]=po.died;
+  });
+  const maxR=Math.max(...sorted.map(po=>po._r));
+
+  const ERAS=[{y:618,l:'初唐'},{y:712,l:'盛唐'},{y:762,l:'中唐'},{y:827,l:'晚唐'}];
+  const grid=document.getElementById('tlGrid');
+
+  for(let r=0;r<=maxR;r++){
+    const row=document.createElement('div');row.className='poet-row';
+    row.style.animationDelay=(r*.032)+'s';
+    if(r===0){
+      ERAS.forEach(e=>{
+        const div=document.createElement('div');div.className='era-div';div.style.left=p(e.y);
+        const lb=document.createElement('div');lb.className='era-lbl';lb.style.left=p(e.y);lb.textContent=e.l;
+        row.appendChild(div);row.appendChild(lb);
+      });
+    }
+    sorted.filter(po=>po._r===r).forEach(po=>{
+      const sc=SCHOOLS[po.school];
+      const L=parseFloat(p(po.born));
+      const W=Math.max(parseFloat(p(po.died))-L,1.6);
+      const bar=document.createElement('div');bar.className='poet-bar';
+      bar.style.cssText=`left:${L}%;width:${W}%;background:${sc.color}`;
+      bar.innerHTML=`<span class="bar-name">${po.name}</span>${W>5?`<span class="bar-yr">${po.born}–${po.died}</span>`:''}`;
+      bar.addEventListener('click',()=>{
+        if(activeBar)activeBar.classList.remove('active');
+        activeBar=bar;bar.classList.add('active');
+        openPanel(po,sc.color,false);
+      });
+      row.appendChild(bar);
+    });
+    grid.appendChild(row);
+  }
+})();
+
+// ═══════════════════════════════════════════════
+// PAGE 2 — SCHOOLS
+// ═══════════════════════════════════════════════
+(function(){
+  const sidebar=document.getElementById('schSidebar');
+  const main=document.getElementById('schMain');
+  const names=Object.keys(SCHOOLS);
+  let cur=names[0];
+  const TOT=TE-TS;
+  function p(y){return ((y-TS)/TOT*100).toFixed(3);}
+
+  function render(name){
+    cur=name;
+    sidebar.querySelectorAll('.sch-tab').forEach(t=>t.classList.toggle('active',t.dataset.s===name));
+    const sc=SCHOOLS[name];
+    const sPoets=sc.poets.map(n=>PM[n]).filter(Boolean);
+    const sorted=[...sPoets].sort((a,b)=>a.born-b.born);
+    const rowEnds=[];
+    sorted.forEach(po=>{
+      let r=0;
+      while(rowEnds[r]!==undefined&&rowEnds[r]>po.born-4)r++;
+      po._sr=r;rowEnds[r]=po.died;
+    });
+    const maxR=Math.max(0,...sorted.map(po=>po._sr));
+
+    let ticks='<div class="mini-rl"></div>';
+    for(let y=TS;y<=TE;y+=50){
+      const pct=p(y);
+      ticks+=`<div class="mini-tick" style="left:${pct}%">
+        <div class="mini-tick-ln" style="height:${y%100===0?'10px':'6px'}"></div>
+        <div class="mini-tick-lb">${y}</div></div>`;
+    }
+
+    let rows='';
+    for(let r=0;r<=maxR;r++){
+      rows+=`<div class="mini-row">`;
+      sorted.filter(po=>po._sr===r).forEach(po=>{
+        const L=p(po.born);
+        const W=Math.max(p(po.died)-p(po.born),2);
+        rows+=`<div class="mini-bar" style="left:${L}%;width:${W}%;background:${sc.color}"
+          onclick="openPanel(PM['${po.name}'],SCHOOLS['${name}'].color,false)">
+          <span class="mini-bar-n">${po.name}</span>
+          ${W>6?`<span class="mini-bar-y">${po.born}–${po.died}</span>`:''}
+        </div>`;
+      });
+      rows+=`</div>`;
+    }
+
+    const cards=sPoets.map(po=>`
+      <div class="poet-card" onclick="openPanel(PM['${po.name}'],SCHOOLS['${name}'].color,false)">
+        <div style="position:absolute;left:0;top:0;bottom:0;width:3px;background:${sc.color};border-radius:6px 0 0 6px"></div>
+        <div class="card-name" style="color:${sc.color}">${po.name}</div>
+        <div class="card-yrs">${po.born} — ${po.died} AD</div>
+        <div class="card-alias">${po.alias}</div>
+      </div>`).join('');
+
+    main.innerHTML=`
+      <div class="sch-title" style="color:${sc.color}">${name}</div>
+      <div class="sch-period" style="border-color:${sc.color}40;color:${sc.color}">⏱ ${sc.period}</div>
+      <div class="sch-tagline" style="border-color:${sc.color};color:${sc.color}">${sc.tagline}</div>
+      <div class="sch-desc">${sc.desc}</div>
+      <div class="sec-title">派内诗人时间轴（618—907 AD）</div>
+      <div class="mini-tl"><div class="mini-ruler">${ticks}</div>${rows}</div>
+      <div class="sec-title">代表诗人（共 ${sPoets.length} 位）</div>
+      <div class="cards-grid">${cards}</div>
+    `;
+  }
+
+  names.forEach(name=>{
+    const sc=SCHOOLS[name];
+    const tab=document.createElement('button');
+    tab.className='sch-tab';tab.dataset.s=name;
+    tab.innerHTML=`<div class="sch-dot" style="background:${sc.color}"></div><div class="sch-tab-name">${name}</div>`;
+    tab.addEventListener('click',()=>render(name));
+    sidebar.appendChild(tab);
+  });
+  render(cur);
+})();
+
+// ═══════════════════════════════════════════════
+// PAGE 3 — NETWORK
+// ═══════════════════════════════════════════════
+let netNodes=[],netEdges=[],netDrag=null,netPan=null,netTx={x:0,y:0};
+const NS='http://www.w3.org/2000/svg';
+
+function initNet(){
+  const wrap=document.getElementById('netWrap');
+  const svg=document.getElementById('netSVG');
+  const W=wrap.clientWidth,H=wrap.clientHeight;
+
+  // Create nodes
+  netNodes=POETS.map((po,i)=>{
+    const sc=SCHOOLS[po.school];
+    const ang=(i/POETS.length)*Math.PI*2;
+    const rad=Math.min(W,H)*0.28;
+    return{id:po.name,poet:po,color:sc.color,
+      x:W/2+rad*Math.cos(ang)+(Math.random()-.5)*60,
+      y:H/2+rad*Math.sin(ang)+(Math.random()-.5)*60,
+      vx:0,vy:0,fixed:false,el:null,circle:null};
+  });
+  const NM={};netNodes.forEach(n=>NM[n.id]=n);
+
+  netEdges=RELS.map(r=>({
+    src:NM[r.s],tgt:NM[r.t],rel:r,type:r.type,el:null
+  })).filter(e=>e.src&&e.tgt);
+
+  // defs for arrowheads
+  const defs=document.createElementNS(NS,'defs');
+  svg.appendChild(defs);
+  ['mentor','influence'].forEach(type=>{
+    const rt=RT[type];
+    const m=document.createElementNS(NS,'marker');
+    m.setAttribute('id','arr-'+type);
+    m.setAttribute('markerWidth','7');m.setAttribute('markerHeight','7');
+    m.setAttribute('refX','20');m.setAttribute('refY','3.5');
+    m.setAttribute('orient','auto');
+    const path=document.createElementNS(NS,'path');
+    path.setAttribute('d','M0,0 L0,7 L7,3.5 z');
+    path.setAttribute('fill',rt.color);path.setAttribute('fill-opacity','0.65');
+    m.appendChild(path);defs.appendChild(m);
+  });
+
+  const gMain=document.createElementNS(NS,'g');
+  gMain.id='netG';svg.appendChild(gMain);
+  const gEdge=document.createElementNS(NS,'g');
+  const gNode=document.createElementNS(NS,'g');
+  gMain.appendChild(gEdge);gMain.appendChild(gNode);
+
+  // edges
+  netEdges.forEach(e=>{
+    const rt=RT[e.type];
+    const line=document.createElementNS(NS,'line');
+    line.setAttribute('stroke',rt.color);
+    line.setAttribute('stroke-width','1.6');
+    line.setAttribute('stroke-opacity','0.5');
+    if(rt.dash!=='none')line.setAttribute('stroke-dasharray',rt.dash);
+    if(e.type==='mentor'||e.type==='influence')
+      line.setAttribute('marker-end','url(#arr-'+e.type+')');
+    e.el=line;gEdge.appendChild(line);
+  });
+
+  // nodes
+  netNodes.forEach(n=>{
+    const g=document.createElementNS(NS,'g');
+    g.style.cursor='pointer';
+
+    const circle=document.createElementNS(NS,'circle');
+    circle.setAttribute('r','18');
+    circle.setAttribute('fill',n.color);
+    circle.setAttribute('stroke','rgba(255,255,255,0.25)');
+    circle.setAttribute('stroke-width','1.5');
+    circle.style.filter='drop-shadow(0 2px 6px rgba(0,0,0,0.5))';
+    circle.style.transition='r 0.2s';
+
+    const txt=document.createElementNS(NS,'text');
+    txt.setAttribute('y','1');
+    txt.setAttribute('text-anchor','middle');
+    txt.setAttribute('dominant-baseline','middle');
+    txt.setAttribute('font-size','11');
+    txt.setAttribute('font-family','Noto Serif SC,serif');
+    txt.setAttribute('fill','rgba(245,236,215,0.92)');
+    txt.setAttribute('pointer-events','none');
+    txt.textContent=n.id;
+
+    g.appendChild(circle);g.appendChild(txt);
+    n.el=g;n.circle=circle;
+    gNode.appendChild(g);
+
+    // drag
+    g.addEventListener('mousedown',ev=>{
+      ev.stopPropagation();
+      netDrag={node:n,ox:ev.clientX-n.x,oy:ev.clientY-n.y};
+      n.fixed=true;
+    });
+    g.addEventListener('click',ev=>{
+      ev.stopPropagation();
+      selectNode(n);
+    });
+    g.addEventListener('touchstart',ev=>{
+      ev.preventDefault();
+      const t=ev.touches[0];
+      netDrag={node:n,ox:t.clientX-n.x,oy:t.clientY-n.y};
+      n.fixed=true;
+    },{passive:false});
+  });
+
+  // pan
+  svg.addEventListener('mousedown',ev=>{
+    netPan={sx:ev.clientX-netTx.x,sy:ev.clientY-netTx.y};
+  });
+  window.addEventListener('mousemove',ev=>{
+    if(netDrag){
+      netDrag.node.x=ev.clientX-netDrag.ox;
+      netDrag.node.y=ev.clientY-netDrag.oy;
+    } else if(netPan){
+      netTx.x=ev.clientX-netPan.sx;
+      netTx.y=ev.clientY-netPan.sy;
+      document.getElementById('netG').setAttribute('transform',`translate(${netTx.x},${netTx.y})`);
+    }
+  });
+  window.addEventListener('mouseup',()=>{
+    if(netDrag){netDrag.node.fixed=false;netDrag=null;}
+    netPan=null;
+  });
+  window.addEventListener('touchmove',ev=>{
+    if(!netDrag)return;
+    const t=ev.touches[0];
+    netDrag.node.x=t.clientX-netDrag.ox;
+    netDrag.node.y=t.clientY-netDrag.oy;
+  },{passive:true});
+  window.addEventListener('touchend',()=>{
+    if(netDrag){netDrag.node.fixed=false;netDrag=null;}
+  });
+
+  // physics
+  (function tick(){
+    const cx=W/2,cy=H/2;
+    const REP=2400,SPR=0.026,REST=145,DAMP=0.87,GRAV=0.007;
+    for(let i=0;i<netNodes.length;i++){
+      const ni=netNodes[i];if(ni.fixed)continue;
+      ni.vx+=(cx-ni.x)*GRAV;ni.vy+=(cy-ni.y)*GRAV;
+      for(let j=i+1;j<netNodes.length;j++){
+        const nj=netNodes[j];
+        const dx=ni.x-nj.x,dy=ni.y-nj.y;
+        const d2=dx*dx+dy*dy+1,d=Math.sqrt(d2);
+        const f=REP/d2,fx=f*dx/d,fy=f*dy/d;
+        ni.vx+=fx;ni.vy+=fy;nj.vx-=fx;nj.vy-=fy;
+      }
+    }
+    netEdges.forEach(e=>{
+      const dx=e.tgt.x-e.src.x,dy=e.tgt.y-e.src.y;
+      const d=Math.sqrt(dx*dx+dy*dy)+.01;
+      const f=(d-REST)*SPR,fx=f*dx/d,fy=f*dy/d;
+      if(!e.src.fixed){e.src.vx+=fx;e.src.vy+=fy;}
+      if(!e.tgt.fixed){e.tgt.vx-=fx;e.tgt.vy-=fy;}
+    });
+    netNodes.forEach(n=>{
+      if(n.fixed)return;
+      n.vx*=DAMP;n.vy*=DAMP;
+      n.x+=n.vx;n.y+=n.vy;
+      n.x=Math.max(28,Math.min(W-28,n.x));
+      n.y=Math.max(28,Math.min(H-28,n.y));
+    });
+    netEdges.forEach(e=>{
+      e.el.setAttribute('x1',e.src.x);e.el.setAttribute('y1',e.src.y);
+      e.el.setAttribute('x2',e.tgt.x);e.el.setAttribute('y2',e.tgt.y);
+    });
+    netNodes.forEach(n=>{
+      n.el.setAttribute('transform',`translate(${n.x},${n.y})`);
+    });
+    requestAnimationFrame(tick);
+  })();
+}
+
+function selectNode(n){
+  const connected=new Set([n.id]);
+  const connEdges=new Set();
+  netEdges.forEach(e=>{
+    if(e.src.id===n.id||e.tgt.id===n.id){
+      connected.add(e.src.id);connected.add(e.tgt.id);
+      connEdges.add(e);
+    }
+  });
+  netNodes.forEach(nd=>{
+    const dim=!connected.has(nd.id);
+    const hi=nd.id===n.id;
+    nd.el.style.opacity=dim?'0.18':'1';
+    nd.circle.setAttribute('r',hi?'22':connected.has(nd.id)?'18':'16');
+    nd.circle.style.filter=hi?`drop-shadow(0 0 12px ${nd.color}) drop-shadow(0 2px 6px rgba(0,0,0,.5))`:'drop-shadow(0 2px 6px rgba(0,0,0,0.5))';
+  });
+  netEdges.forEach(e=>{
+    e.el.setAttribute('stroke-opacity',connEdges.has(e)?'0.9':'0.04');
+    if(connEdges.has(e))e.el.setAttribute('stroke-width','2.2');
+    else e.el.setAttribute('stroke-width','1.6');
+  });
+  const sc=SCHOOLS[n.poet.school];
+  openPanel(n.poet,sc.color,true);
+}
+
+function resetHighlight(){
+  if(!netReady)return;
+  netNodes.forEach(n=>{
+    n.el.style.opacity='1';
+    n.circle.setAttribute('r','18');
+    n.circle.style.filter='drop-shadow(0 2px 6px rgba(0,0,0,0.5))';
+  });
+  netEdges.forEach(e=>{
+    e.el.setAttribute('stroke-opacity','0.5');
+    e.el.setAttribute('stroke-width','1.6');
+  });
+}
+</script>
+</body>
+</html>
